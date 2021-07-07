@@ -4,3 +4,6 @@
 - [Cualidades del Diseño]("CualidadesDelDiseño.md")
 - [Manejo de Errores]("ManejoDeErrores.md")
 - [Patrones de Diseño]("PatronesDeDiseño.md)
+- [Testing]("Testing.md)
+- [Manejo del Cambio]("ManejoDelCambio.md)
+- [Code Smells]("CodeSmells.md)
