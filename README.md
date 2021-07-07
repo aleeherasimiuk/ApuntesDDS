@@ -7,3 +7,4 @@
 - [Testing]("Testing.md)
 - [Manejo del Cambio]("ManejoDelCambio.md)
 - [Code Smells]("CodeSmells.md)
+- [Biblioteca vs Framework]("BibliotecaVSFramework.md)
