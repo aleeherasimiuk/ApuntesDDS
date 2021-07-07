@@ -1,7 +1,7 @@
 # Cualidades del Diseño
 
 - Sirven como heurísticas para decidir
-- Sirven como argumento para justificar un diseño
+- Sirven como argumento para justificar un diseño (Facilitar la comunicación)
 - Tensión entre cualidades
   - Favorecer una cualidad, puede perjudicar a otra.
   - Síndrome de la frazada corta
@@ -71,6 +71,13 @@
 ## Escalabilidad
 
 - Soportar más operaciones sin degradar la eficiencia del sistema
+
+## Extensibilidad != Escalabilidad
+
+- La extensibilidad refiere a la facilidad que existe para agregar una funcionalidad nueva con poco impacto (Ej: Muchos ifs vs polimorfismo, poca cohesión, mucho acoplamiento, etc)
+
+- La escalabilidad refiere a cómo responde el programa cuando hay más carga, si está pensado para 10, ¿cómo funciona para 100?
+
 
 
 
