@@ -21,6 +21,15 @@
 
 - Alguien prueba la aplicación funcionalmente
 
+
+## Test de Stress
+- Refiere a la carga
+  
+## Test de aceptación
+- El usuario está de acuerdo con lo hecho
+## Test de regresión
+- Nuevo código no destruye el anterior
+
 <br>
 
 ## Características
@@ -37,9 +46,9 @@
 
 ### Partes de una prueba
 
-- Inicialización
-- Ejecución
-- Validación
+- Inicialización del contexto
+- Ejecución de las pruebas
+- Validación de los resultados
 
 ### Los tests unitarios deben ser:
 
@@ -52,6 +61,11 @@
 - Cobertura
   - Un 100% no asegura que el código funcione bien
 - Análisis de código
+- Testing unitario
+- Revisión del código
+- Pair programming
+- Branches
+- CI/CD
 
 <br>
 
