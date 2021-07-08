@@ -375,6 +375,75 @@ class DragonQueConcedeDeseos{
 
 
 
+---
+
+## Facade
+
+- Ocultar detalles a otro subsistema u otros componentes
+- El sistema externo no conoce internamente al sistema.
+- No caer en *Man in the middle*
+
+```java
+// Man in the middle. No oculta nada
+public void inactivar(Cliente cliente){
+  cliente.inactivar()
+}
+```
+
+- Usar clases abstractas o interfaces no implican un *Facade*
+
+
+
+## Adapter
+
+- Tenemos un componente externo
+- No lo podemos modificar
+- Nosotros solo modelamos la interfaz saliente
+
+<div align=center>
+
+![img](http://www.plantuml.com/plantuml/png/NOw_IiTG38NtF4N65lGDIcdfug0eA3Z7t5WZzq_9pHL417VVqYSHMntyZScNdEzCrScyfGWSgLQyiV8Y4eejKHEz0I2kudUIDZ7oPjJrn-gY9GaK_iQbvA2i9KlTFrsPQjVZrySdl0F0_rmy7t5cRlT2_YGsRmgQNUoHM4x0Nk5IgmzNj0stRfhNCxn-U1RsSVnH_zvs1qDMV-rXbqwIGqln6m00)
+</div>
+
+- Interfaz de AccuWeatherApi con muchos smells, como por ejemplo obsesión con los primitivos.
+- Lo adapto mediante ProveedorClima
+
+```java
+class ProveedorClima{
+
+  int getTemperatura(){
+    AccuWeatherAPI apiClima = new AccuWeatherAPI();
+    List<Map<String, Object>> condicionesClimáticas = apiClima.getWeather("Buenos Aires, Argentina");
+
+    return condicionesClimaticas.get(0).get("Temperature").get("Value").toDegrees();
+  }
+
+}
+
+```
+
+Finalmente se pueden hacer adapters para cada API:
+
+<div align=center>
+
+![img](http://www.plantuml.com/plantuml/png/VL3DIWD13BxFK-Iu2zedA4DBBmgA1GNFCHDhP6TcoMG4AGNllgLFuluew2BcbkJxIRvDCLIhiNFKOIcmr_p27BBkEebuT0xWm7R7iMT5gufDEuykQkI0uRlTvHI492Sk4zE4i3GjVBozkvCRIfAnFY8nR8dgFQCziMvxcIokfDZw6llrhQcamndSF3mpcVUZz1UscNT0Og-j6qL_t_fJTdy9vtvXz3zyLLT-yVnVYInenvFRS0f3V9y0)
+
+</div>
+
+
+### Conclusiones
+
+- Adapta interfaces que en principio no son compatibles
+- Quiero interactuar con clases imprevistas, que muy probablemente sus interfaces sean distintas
+
+### En el diagrama
+- Cliente: Código que llama al adapter
+- Adaptee: API
+- Target: ProveedorClima
+- Adapter: ProveedorClimaAccuWeatherAPI
+
+
+
 
 
 

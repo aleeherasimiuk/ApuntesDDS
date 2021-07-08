@@ -8,3 +8,5 @@
 - [Manejo del Cambio]("ManejoDelCambio.md)
 - [Code Smells]("CodeSmells.md)
 - [Biblioteca vs Framework]("BibliotecaVSFramework.md)
+- [Interfaces entre componentes]("InterfazEntreComponentes.md)
+- [Dependencias]("Dependencias.md")
