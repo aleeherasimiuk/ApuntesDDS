@@ -10,3 +10,5 @@
 - [Biblioteca vs Framework]("BibliotecaVSFramework.md)
 - [Interfaces entre componentes]("InterfazEntreComponentes.md)
 - [Dependencias]("Dependencias.md")
+- [Patrones de Comunicación]("PatronesDeComunicacion.md")
+- [Tareas Programadasd]("TareasProgramadas.md)

@@ -443,7 +443,285 @@ Finalmente se pueden hacer adapters para cada API:
 - Adapter: ProveedorClimaAccuWeatherAPI
 
 
+## Patrón Command | Reificar comportamiento
 
+- Diferir operaciones en el tiempo
+- Modelar un objeto que representa una operación
+- La creación y la evaluación se hacen en dos momentos distintos
+- Ahora el agregarPrenda o quitarPrenda pasaron a ser un objeto
+- Cuando genero una sugerencia, en lugar de llamar al método agregarPrenda, creo un objeto que representa el agregar, que se aplicaría o no en otro momento.
+- Usar lambdas me pueden hacer perder expresividad (Tipan como Consumer, Function, etc). Pierdo la abstracción que me representa la operación de mi dominio. Son más dificiles de persistir. Y no puedo agregar más métodos.
+
+```java
+abstract class Sugerencia{
+
+  EstadoSugerencia estado;
+  Prenda prenda;
+
+
+  void aplicarEnGuadarropas(Guardarropas guardarropas){
+    this.estado = ACEPTADA;
+    this.aplicarOperacion(Guardarropas guardarropas);
+  }
+
+  void deshacer(Guardarropas guardarropas){
+    Validate.is(this.estado, ACEPTADA);
+    this.deshacerOperacion(guardarropas)
+  }
+
+  abstract void aplicarOperacion(Guardarropas guardarropas);
+  abstract void deshacerOperacion(Guardarropas guardarropas);
+
+
+}
+
+class SugerenciaAgregar extends Sugerencia{
+
+  void aplicarOperacion(Guardarropas guardarropas){
+    guardarropas.agregarSugerencia(prenda);
+  }
+
+  void deshacer(Guardarropas guardarropas){
+    guardarropas.quitarSugerencia(prenda);
+  }
+
+}
+
+class SugerenciaQuitar extends Sugerencia{
+
+  void aplicarOperacion(Guardarropas guardarropas){
+    guardarropas.quitarSugerencia(prenda);
+  }
+
+  void deshacer(Guardarropas guardarropas){
+    guardarropas.agregarSugerencia(prenda);
+  }
+
+}
+
+class Guardarropas{
+
+  List<Sugerencia> sugerencias;
+
+  void agregarSugerencia(Sugerencia sugerencia){
+    this.sugerencias.add(sugerencia);
+  }
+
+  void quitarSugerencia(Sugerencia sugerencia){
+    this.sugerencias.remove(sugerencia);
+  }
+}
+
+```
+
+- Command: **Sugerencia** (Objeto que entiende el mensaje que realiza la Operación, Interface o Abstract).
+  - Operación: **aplicarEnGuardarropas()**.
+- ConcreteCommand: **SugerenciaAgregar** y **SugerenciaQuitar**. Realizan la operación.
+- Receiver: **Guardarropas**.
+  - Acción: **agregar(), quitar()**.
+- Invoker: **UI**.
+- Client: **UI** (Conoce al Receptor e instancia al Concrete Command).
+
+
+
+## Observer
+
+- Observadores se suscriben a un evento
+- El sujeto cuando ocurre el evento notifica a los observadores
+- Los observadores son los interesados
+- El sujeto conoce a los interesados
+- Los interesados se guardan en algún lado
+- El observado notifica a los observadores
+- Es conveniente que **No aborten el flujo de ejecución**
+  - Los observadores no deben romper
+- No debería importar el orden de los observadores
+- Es conveniente que se piensen como que solo se dispara la operación (Fire and forget)
+
+```java
+
+// En algun lugar
+void actualizarAlertas(){
+  this.alertas = proveedorClima.getAlertas(ciudad);
+  RepositorioUsuarios.getInstance().todos().forEach(
+    usuario.hayAlertas(this.alertas)
+  );
+}
+
+// Usuario
+void hayAlertas(alertas){
+  this.interesados.forEach(
+    interesado -> interesado.hayAlertas(alertas)
+  )
+}
+
+```
+
+- Evento `getAlertas()`
+- Notificación: el contenido de `hayAlertas(alertas)`
+- El usuario es el interesado que tiene "interesados", porque decide qué cosas hacer
+
+Sujeto: Tiene la colección de observers
+Observer: Es la interfaz que entiende `notify()` (o `hayAlertas()`)
+ConcreteObserver: Cada una de las clases que implementan Observer
+
+
+Ejemplo Nefli:
+
+<div align = center>
+
+![img](http://www.plantuml.com/plantuml/png/VP71IiH038RlUOgmfnPa7q7MYo08BWhUnqvM0zEap6G4MNnt2T8bLDnBIaA-lr_QGxDKhSy5M8pgAKs4pxHKpNqohMS0n3VLGabmAUbhuFpAcVG6PvPk-Y0yiOw0-AcSiPakmmXhM-cTcr5zagEpNXvz85Hn2Stu5tZn92yNmBEl0FSit3w6tyS5EeNMiUzmPzGvhu4gnt2c0n2GA1GG7s-_pDraFPLjGDIB4Qj-V6_u3xZVt-AkjxJ3QFtFYkjSNzbu01n8Sf_B3m00)
+</div>
+
+
+
+```java
+RepoPelis.getInstance().pendientes(); // Devuelve las pendientes
+reproductor.registerOnStop(new StopHandler());
+reproductor.registerOnFinish(new FinishHandler());
+
+class RepoPelis{
+
+  List<Peli> pelis;
+
+  List<Peli> pendientes(){
+    this.pelis.filter(peli -> peli.estaPendiente)
+  }
+
+}
+
+class Peli{
+
+  int idVideo;
+  int minutoActual = 0;
+
+  boolean estaPendiente(){
+    return minutoActual != 0;
+  }
+
+  void continuarViendo(){
+    reproductor.play(idVideo, minutoActual);
+  }
+}
+
+class StopHandler implements StopListener{
+
+  void onStop(idVideo, minutoActual){
+    peli = RepoPelis.getInstance().findPeli(idVideo);
+    peli.setMinutoActual(minutoActual);
+  }
+}
+
+class FinishHandler implements FinishListener{
+
+  void onFinish(idVideo){
+    peli = RepoPelis.getInstance().findPeli(idVideo);
+    peli.setMinutoActual(0);
+  }
+}
+```
+
+
+## Repositorio
+
+- Conoce a todas las instancias de un tipo.
+- Puede retornarlas todas.
+- Retorar segun criterio.
+- Agregar/remover.
+
+
+## State
+
+- Cosificar estado
+- Estado que tiene comportamiento
+- El estado sabe transicionar entre estados
+
+<div align = center>
+
+![img](http://www.plantuml.com/plantuml/png/LOynhi8m44HxdsBB_mjo11G9aDBGSO75MT0YhotPQnhWxXYIOATzysQawPDYr2pEi5UA5xG4XyB6y300DWZ5Fy5aW-9_0RTynGQyZB4EKuBZH6gdoesr2rx9Jnfx1SztSks86xA4-8dtg7HYeUAnvR14LHvGpf6_QuKjoz3bxhcT7vYbjQQrkURp1zZyI4z-pEBU)
+ </div>
+
+- La mascota no sabe comer y jugar, sino que depende del estado
+- A diferencia del Strategy, el comportamiento está asociado al Estado y no al Algoritmo
+- El strategy se setea arbitrario
+- El state sabe cómo transicionar entre cada uno de los estados
+- Los cambios de estados no son arbitrarios
+- Que se llame Estado no implica que sea State
+- Validaciones que dan error no necesariamente devienen en un State
+
+
+```java
+class Deuda{
+
+  Estado estado;
+
+  void pagar(){
+    estado.pagar(this)
+  }
+}
+
+class Pendiente{
+  void pagar(Deuda deuda){
+    deuda.setEstado(new Pagado())
+  }
+}
+
+class Pagado{
+  void pagar(Deuda deuda){
+    throw new YaEstaPaga()
+  }
+}
+```
+
+Esta solución tiene pinta de State pero no lo es, ya no son polimórficos, hay uno que anda pero otro no. Quizá sea más sencillo modelarlo con un booleano.
+
+
+
+## Composite
+
+- Modelar una estructura recursiva polimórfica
+
+<div align = center>
+
+![img](http://www.plantuml.com/plantuml/png/VP2n2i9038RtUuhGIOM-GYbsSXFi9Wvf6wHmPyeb9qZrtJrf1NiKfy2NvF_WBqNHQt3Mj1P5uEZvGQto-38pgT4JZWO06r6FhKB7eR44LzAAHRbcHRlP6aWN2JkuWQNN_ivhntiKYdofFVLki1Jbwyxql68t11B5-36HymNqC-Lln8yByf0_Y-dPB4CNgszFa1UGxRAPbdJhOfTl)
+
+
+</div>
+
+- La tarea simple son los nodos terminales (Finalizan la estructura recursiva)
+- Las tareas compuestas tienen un conjunto de tareas que pueden ser simples o compuestas
+- Trato a todas por igual (Todas saben decir el costo total)
+
+```java
+
+class Proyecto{
+
+  List<Tarea> tareas;
+
+  public double getCostoTotal(){
+    return this.getCosto() + tareas.sum(tarea -> tarea.getCostoTotal());
+  }
+}
+
+class TareaSimple{
+  public double getCostoTotal(){
+    return this.getCosto();
+  }
+}
+
+class TareaCompuesta{
+
+  List<Tarea> subtareas;
+
+  public double getCostoTotal(){
+    return this.getCosto() + subtareas.sum(tarea -> tarea.getCostoTotal());
+  }
+}
+```
+
+- Client: Proyecto - Usa de forma polimórfica a los nodos
+- Component: Tarea - El genérico
+- Leaf: TareaSimple - La hoja - Nodo terminal
+- Composite: TareaCompuesta - Nodo compuesto
 
 
 

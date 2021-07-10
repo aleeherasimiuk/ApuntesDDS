@@ -6,11 +6,15 @@
 ### Interfaz entrante
 
 - El componente es llamado por otro componente.
+- Nuestra responsabilidad es exponer una operación
+- Cambios impactarán en los componentes que lo usan
 
 
 ### Interfaz saliente
 
 - El componente llama a otro componente.
+- No puedo cambiar al componente externo
+- Para interfaces no muy adecuadas puede utilizarse un adapter
 
 
 ```java
@@ -62,8 +66,6 @@ Desventaja:
   - B y Buffer puede ser la misma clase
   - Hay acomplamiento implícito
     - A está acoplado a B, aunque no hablen directamente
-
-
 
 
 
